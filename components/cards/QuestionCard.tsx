@@ -1,7 +1,10 @@
-import ROUTES from "@/constants/routes";
-import { getTimeStamp } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
+
+import ROUTES from "@/constants/routes";
+import { getTimeStamp } from "@/lib/utils";
+import { Question, Tag } from "@/types/global";
+
 import TagCard from "./TagCard";
 import Metric from "../Metric";
 
@@ -13,7 +16,7 @@ const QuestionCard = ({
   question: { _id, title, tags, author, createdAt, upvotes, answers, views },
 }: Props) => {
   return (
-    <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
+    <div className="card-wrapper rounded-2.5 p-9 sm:px-11">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
         <div>
           <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
