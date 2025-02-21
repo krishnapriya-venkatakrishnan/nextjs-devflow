@@ -110,7 +110,7 @@ export const getTagQuestions = async (
       .select("_id title views answers upvotes downvotes author createdAt")
       .populate([
         { path: "author", select: "name image" },
-        { path: "tage", select: "name" },
+        { path: "tags", select: "name" },
       ])
       .skip(skip)
       .limit(limit);
