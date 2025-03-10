@@ -16,6 +16,8 @@ import {
 import handleError from "../handlers/error";
 import { Answer, Question, Vote } from "@/database";
 import mongoose, { ClientSession } from "mongoose";
+import { revalidatePath } from "next/cache";
+import ROUTES from "@/constants/routes";
 
 export async function updateVoteCount(
   params: UpdateVoteCountParams,
@@ -62,7 +64,6 @@ export async function createVote(
     schema: CreateVoteSchema,
     authorize: true,
   });
-
   if (validationResult instanceof Error) {
     return handleError(validationResult) as ErrorResponse;
   }
@@ -82,6 +83,7 @@ export async function createVote(
       actionId: targetId,
       actionType: targetType,
     }).session(session);
+
     if (existingVote) {
       if (existingVote.voteType === voteType) {
         // If the user has already voted with the same voteType, remove the vote
@@ -109,10 +111,10 @@ export async function createVote(
       await Vote.create(
         [
           {
-            targetId,
-            targetType,
+            author: userId,
+            actionId: targetId,
+            actionType: targetType,
             voteType,
-            change: 1,
           },
         ],
         { session }
@@ -123,6 +125,8 @@ export async function createVote(
       );
     }
     await session.commitTransaction();
+    revalidatePath(ROUTES.QUESTION(targetId));
+
     return { success: true };
   } catch (error) {
     await session.abortTransaction();
