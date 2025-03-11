@@ -21,7 +21,7 @@ export const DEFAULT_ERROR = {
 export const EMPTY_QUESTION = {
   title: "Ahh, No Questions Yet!",
   message:
-    "The question board is empty. Maybe it’s waiting for your brilliant question to get things rolling",
+    "The question board is empty. Maybe it's waiting for your brilliant question to get things rolling",
   button: {
     text: "Ask a Question",
     href: ROUTES.ASK_QUESTION,
@@ -43,11 +43,11 @@ export const EMPTY_ANSWERS = {
 };
 
 export const EMPTY_COLLECTIONS = {
-  title: "Collections Are Empty",
+  title: "No collections Found",
   message:
-    "Looks like you haven’t created any collections yet. Start curating something extraordinary today",
-  button: {
-    text: "Save to Collection",
-    href: ROUTES.COLLECTION,
-  },
+    "Looks like you haven't created any collections yet. Start curating something extraordinary today",
+  // button: {
+  //   text: "Save to Collection",
+  //   href: ROUTES.COLLECTION,
+  // },
 };
