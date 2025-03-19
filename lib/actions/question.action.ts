@@ -149,11 +149,15 @@ export async function editQuestion(
 
     if (tagsToRemove.length > 0) {
       const tagIdsToRemove = tagsToRemove.map((tag: ITagDoc) => tag._id);
+
       await Tag.updateMany(
-        { id: { $in: tagIdsToRemove } },
+        { _id: { $in: tagIdsToRemove } },
         { $inc: { questions: -1 } },
         { session }
       );
+
+      await Tag.deleteMany({ questions: { $lte: 0 } }, { session });
+
       await TagQuestion.deleteMany(
         { tag: { $in: tagIdsToRemove }, question: questionId },
         { session }
