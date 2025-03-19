@@ -56,3 +56,13 @@ export const EMPTY_USERS = {
   title: "No Users Found",
   message: "You're ALONE. The only one here. More users are coming soon!",
 };
+
+export const EMPTY_TOP_QUESTIONS = {
+  title: "No questions found",
+  message: "No questions have been asked yet.",
+};
+
+export const EMPTY_TOP_TAGS = {
+  title: "No tags found",
+  message: "No tags have been created yet.",
+};
