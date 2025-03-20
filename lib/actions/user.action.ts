@@ -4,6 +4,7 @@ import {
   ActionResponse,
   ErrorResponse,
   PaginatedSearchParams,
+  User as UserGType,
 } from "@/types/global";
 import action from "../handlers/action";
 import { GetUserSchema, PaginatedSearchParamsSchema } from "../validation";
@@ -14,7 +15,7 @@ import { GetUserParams } from "@/types/action";
 
 export async function getUsers(
   params: PaginatedSearchParams
-): Promise<ActionResponse<{ users: (typeof User)[]; isNext: boolean }>> {
+): Promise<ActionResponse<{ users: UserGType[]; isNext: boolean }>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
@@ -72,7 +73,7 @@ export async function getUsers(
 
 export async function getUser(params: GetUserParams): Promise<
   ActionResponse<{
-    user: typeof User;
+    user: UserGType;
     totalQuestions: number;
     totalAnswers: number;
   }>
