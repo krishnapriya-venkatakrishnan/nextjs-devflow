@@ -16,6 +16,7 @@ import action from "../handlers/action";
 import handleError from "../handlers/error";
 import {
   AskQuestionSchema,
+  DeleteQuestionSchema,
   EditQuestionSchema,
   GetQuestionSchema,
   IncrementViewsSchema,
@@ -23,11 +24,14 @@ import {
 } from "../validation";
 import {
   CreateQuestionParams,
+  DeleteQuestionParams,
   EditQuestionParams,
   GetQuestionParams,
   IncrementViewsParams,
 } from "@/types/action";
 import dbConnect from "../mongoose";
+import { Answer, Collection, Vote } from "@/database";
+import { revalidatePath } from "next/cache";
 
 export async function createQuestion(
   params: CreateQuestionParams
@@ -326,5 +330,81 @@ export async function getHotQuestions(): Promise<
     };
   } catch (error) {
     return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function deleteQuestion(
+  params: DeleteQuestionParams
+): Promise<ActionResponse> {
+  const validationResult = await action({
+    params,
+    schema: DeleteQuestionSchema,
+    authorize: true,
+  });
+  if (validationResult instanceof Error)
+    return handleError(validationResult) as ErrorResponse;
+
+  const { questionId } = validationResult.params!;
+  const { user } = validationResult.session!;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const question = await Question.findById(questionId).session(session);
+    if (!question) throw new Error("Question not found");
+
+    if (question.author.toString() !== user?.id)
+      throw new Error("You are not authorized to delete this question");
+
+    // Delete related entries inside the transaction
+    await Collection.deleteMany({ question: questionId }).session(session);
+
+    // If there are tags associated with the question, then delete the respective TagQuestion documents, update the Tag document with correct questions count. If there are no questions associated with the Tag, then delete the Tag document.
+    if (question.tags.length > 0) {
+      await TagQuestion.deleteMany({ question: questionId }).session(session);
+      await Tag.updateMany(
+        { _id: { $in: question.tags } },
+        { $inc: { questions: -1 } },
+        { session }
+      );
+      await Tag.deleteMany({ questions: { $lte: 0 } }, { session });
+    }
+
+    // If there are votes, then delete the respective Vote documents.
+    if (question.upvotes || question.downvotes) {
+      await Vote.deleteMany({
+        actionId: questionId,
+        actionType: "question",
+      }).session(session);
+    }
+
+    // If there are answers posted for the question, find the Answer documents and delete its related Vote documents. Finally delete the Answer documents.
+    if (question.answers) {
+      const answers = await Answer.find({ question: questionId }).session(
+        session
+      );
+
+      if (answers.length > 0) {
+        await Answer.deleteMany({ question: questionId }).session(session);
+
+        await Vote.deleteMany({
+          actionId: { $in: answers.map((answer) => answer._id) },
+          actionType: "answer",
+        }).session(session);
+      }
+    }
+
+    await Question.findByIdAndDelete(questionId).session(session);
+
+    await session.commitTransaction();
+
+    revalidatePath(`/profile/${user?.id}`);
+    return { success: true };
+  } catch (error) {
+    await session.abortTransaction();
+    return handleError(error) as ErrorResponse;
+  } finally {
+    await session.endSession();
   }
 }

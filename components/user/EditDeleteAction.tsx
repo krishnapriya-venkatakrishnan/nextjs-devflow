@@ -11,6 +11,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
+import { deleteAnwer } from "@/lib/actions/answer.action";
+import { deleteQuestion } from "@/lib/actions/question.action";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -28,16 +30,36 @@ const EditDeleteAction = ({ type, itemId }: Props) => {
   const handleDelete = async () => {
     if (type === "Question") {
       // Call action to delete the question
-      toast({
-        title: "Question deleted",
-        description: "Your question has been deleted successfully.",
-      });
+      const { success, error } = await deleteQuestion({ questionId: itemId });
+
+      if (success) {
+        toast({
+          title: "Question deleted",
+          description: "Your question has been deleted successfully.",
+        });
+      } else {
+        toast({
+          title: "Question not deleted",
+          description: `An error occured while deleting the question: ${error?.message}`,
+          variant: "destructive",
+        });
+      }
     } else {
       // Call action to delete the answer
-      toast({
-        title: "Answer deleted",
-        description: "Your answer has been deleted successfully.",
-      });
+      const { success, error } = await deleteAnwer({ answerId: itemId });
+
+      if (success) {
+        toast({
+          title: "Answer deleted",
+          description: "Your answer has been deleted successfully.",
+        });
+      } else {
+        toast({
+          title: "Answer not deleted",
+          description: `An error occured while deleting the answer: ${error?.message}`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
