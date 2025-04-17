@@ -18,8 +18,10 @@ import { Answer, Question, Vote } from "@/database";
 import mongoose, { ClientSession } from "mongoose";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
+import { after } from "next/server";
+import { createInteraction } from "./interaction.action";
 
-export async function updateVoteCount(
+async function updateVoteCount(
   params: UpdateVoteCountParams,
   session?: ClientSession
 ): Promise<ActionResponse> {
@@ -45,9 +47,7 @@ export async function updateVoteCount(
     );
 
     if (!result) {
-      return handleError(
-        new Error("Failed to update vote count")
-      ) as ErrorResponse;
+      throw new Error("Failed to update vote count");
     }
 
     return { success: true };
@@ -78,6 +78,11 @@ export async function createVote(
   session.startTransaction();
 
   try {
+    const Model = targetType === "question" ? Question : Answer;
+    const contentDoc = await Model.findById(targetId).session(session);
+    if (!contentDoc) throw new Error("Content not found");
+    const contentAuthorId = contentDoc.author.toString();
+
     const existingVote = await Vote.findOne({
       author: userId,
       actionId: targetId,
@@ -86,7 +91,7 @@ export async function createVote(
 
     if (existingVote) {
       if (existingVote.voteType === voteType) {
-        // If the user has already voted with the same voteType, remove the vote
+        // If the user is voting again with the same vote type, remove the vote
         await Vote.deleteOne({
           _id: existingVote._id,
         }).session(session);
@@ -95,7 +100,7 @@ export async function createVote(
           session
         );
       } else {
-        // If the user has already voted with a different voteType, update the vote
+        // If the user is changing their vote, update voteType and adjust counts
         await Vote.findByIdAndUpdate(
           existingVote._id,
           { voteType },
@@ -111,7 +116,7 @@ export async function createVote(
         );
       }
     } else {
-      // If the user has not voted yet, create a new Vote
+      // First-time vote creation
       await Vote.create(
         [
           {
@@ -128,6 +133,17 @@ export async function createVote(
         session
       );
     }
+
+    // log the interaction
+    after(async () => {
+      await createInteraction({
+        action: voteType,
+        actionId: targetId,
+        actionTarget: targetType,
+        authorId: contentAuthorId,
+      });
+    });
+
     await session.commitTransaction();
     revalidatePath(ROUTES.QUESTION(targetId));
 
