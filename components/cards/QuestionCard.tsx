@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import React from "react";
 
@@ -8,6 +9,7 @@ import { Question, Tag } from "@/types/global";
 import TagCard from "./TagCard";
 import Metric from "../Metric";
 import EditDeleteAction from "../user/EditDeleteAction";
+import { incrementViews } from "@/lib/actions/question.action";
 
 interface Props {
   question: Question;
@@ -18,6 +20,10 @@ const QuestionCard = ({
   question: { _id, title, tags, author, createdAt, upvotes, answers, views },
   showActionBtns = false,
 }: Props) => {
+  const handleViews = async (id: string) => {
+    await incrementViews({ questionId: id });
+  };
+
   return (
     <div className="card-wrapper rounded-2.5 p-9 sm:px-11">
       <div className="flex flex-col-reverse items-center justify-between gap-5 sm:flex-row">
@@ -26,7 +32,7 @@ const QuestionCard = ({
             {getTimeStamp(createdAt)}
           </span>
 
-          <Link href={ROUTES.QUESTION(_id)}>
+          <Link href={ROUTES.QUESTION(_id)} onClick={() => handleViews(_id)}>
             <h3 className="sm:h3-semibold base-semibold text-dark200_light900 line-clamp-1 flex-1">
               {title}
             </h3>

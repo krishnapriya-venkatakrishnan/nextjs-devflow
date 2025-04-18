@@ -8,6 +8,7 @@ import { hasVoted } from "@/lib/actions/vote.action";
 import { Suspense } from "react";
 import Votes from "../votes/Votes";
 import EditDeleteAction from "../user/EditDeleteAction";
+import ReadMore from "../answers/ReadMore";
 
 interface Props extends Answer {
   containerClasses?: string;
@@ -77,14 +78,7 @@ const AnswerCard = ({
 
       <Preview content={content} />
 
-      {showReadMore && (
-        <Link
-          href={`/questions/${question}#answer-${_id}`}
-          className="body-semibold relative z-10 font-space-grotesk text-primary-100"
-        >
-          <p className="mt-1">Read more...</p>
-        </Link>
-      )}
+      {showReadMore && <ReadMore question={question} answer={_id} />}
     </article>
   );
 };
