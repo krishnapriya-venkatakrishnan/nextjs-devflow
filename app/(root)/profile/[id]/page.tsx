@@ -6,6 +6,7 @@ import {
   getUser,
   getUserAnswers,
   getUserQuestions,
+  getUserStats,
   getUserTopTags,
 } from "@/lib/actions/user.action";
 import { RouteParams } from "@/types/global";
@@ -36,12 +37,18 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
   if (!success) {
     return (
       <div>
-        <div className="h1-bold text-dark100_light900">{error?.message}</div>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <h1 className="h1-bold text-dark100_light900">User not found</h1>
+          <p className="paragraph-regular text-dark200_light800 max-w-md">
+            {error?.message}
+          </p>
+        </div>
       </div>
     );
   }
 
-  const { user, totalQuestions, totalAnswers } = data!;
+  const { user } = data!;
+  const { data: userStats } = await getUserStats({ userId: id });
   const {
     _id,
     name,
@@ -114,7 +121,7 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
                 />
               )}
               {location && (
-                <ProfileLink imgUrl="/icons/location.svg" title="Location" />
+                <ProfileLink imgUrl="/icons/location.svg" title={location} />
               )}
               <ProfileLink
                 imgUrl="/icons/calendar.svg"
@@ -141,13 +148,15 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
         </div>
       </section>
       <Stats
-        totalQuestions={totalQuestions}
-        totalAnswers={totalAnswers}
-        badges={{
-          GOLD: 0,
-          SILVER: 0,
-          BRONZE: 0,
-        }}
+        totalQuestions={userStats?.totalQuestions || 0}
+        totalAnswers={userStats?.totalAnswers || 0}
+        badges={
+          userStats?.badges || {
+            GOLD: 0,
+            SILVER: 0,
+            BRONZE: 0,
+          }
+        }
         reputationPoints={reputation || 0}
       />
       <section className="mt-10 flex gap-10">
@@ -184,7 +193,7 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
               )}
             />
 
-            <Pagination page={page} isNext={hasMoreQuestions} />
+            <Pagination page={page} isNext={hasMoreQuestions || false} />
           </TabsContent>
           <TabsContent value="answers" className="flex w-full flex-col gap-6">
             <DataRenderer
@@ -198,7 +207,7 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
                     <AnswerCard
                       key={answer._id}
                       {...answer}
-                      content={answer.content.slice(0, 27)}
+                      content={answer.content.slice(0, 270)}
                       containerClasses="card-wrapper rounded-[10px] px-7 py-9 sm:px-11"
                       showReadMore
                       showActionBtns={
