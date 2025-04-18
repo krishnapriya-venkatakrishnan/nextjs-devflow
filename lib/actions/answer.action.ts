@@ -22,7 +22,6 @@ import mongoose from "mongoose";
 import { Question, Vote } from "@/database";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
-import { after } from "next/server";
 import { createInteraction } from "./interaction.action";
 
 export async function createAnswer(
@@ -69,13 +68,13 @@ export async function createAnswer(
     await question.save({ session });
 
     // log the interaction
-    after(async () => {
-      await createInteraction({
-        action: "post",
-        actionId: newAnswer._id.toString(),
-        actionTarget: "answer",
-        authorId: userId as string,
-      });
+
+    await createInteraction({
+      action: "post",
+      actionId: newAnswer._id.toString(),
+      actionTarget: "answer",
+      authorId: userId as string,
+      session,
     });
 
     await session.commitTransaction();
@@ -155,7 +154,7 @@ export async function getAnswers(params: GetAnswersParams): Promise<
   }
 }
 
-export async function deleteAnwer(
+export async function deleteAnswer(
   params: DeleteAnswerParams
 ): Promise<ActionResponse> {
   const validationResult = await action({
@@ -198,13 +197,12 @@ export async function deleteAnwer(
     await Answer.findByIdAndDelete(answerId).session(session);
 
     // log the interaction
-    after(async () => {
-      await createInteraction({
-        action: "delete",
-        actionId: answerId,
-        actionTarget: "answer",
-        authorId: user?.id as string,
-      });
+    await createInteraction({
+      action: "delete",
+      actionId: answerId,
+      actionTarget: "answer",
+      authorId: user?.id as string,
+      session,
     });
 
     await session.commitTransaction();

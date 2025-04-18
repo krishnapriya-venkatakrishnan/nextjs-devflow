@@ -33,7 +33,6 @@ import {
 import dbConnect from "../mongoose";
 import { Answer, Collection, Interaction, Vote } from "@/database";
 import { revalidatePath } from "next/cache";
-import { after } from "next/server";
 import { createInteraction } from "./interaction.action";
 import { auth } from "@/auth";
 
@@ -89,13 +88,12 @@ export async function createQuestion(
     );
 
     // log the interaction
-    after(async () => {
-      await createInteraction({
-        action: "post",
-        actionId: question._id.toString(),
-        actionTarget: "question",
-        authorId: userId as string,
-      });
+    await createInteraction({
+      action: "post",
+      actionId: question._id.toString(),
+      actionTarget: "question",
+      authorId: userId as string,
+      session,
     });
 
     await session.commitTransaction();
@@ -477,19 +475,30 @@ export async function deleteQuestion(
           actionId: { $in: answers.map((answer) => answer._id) },
           actionType: "answer",
         }).session(session);
+
+        await Promise.all(
+          answers.map((ans) => {
+            createInteraction({
+              action: "delete",
+              actionId: ans._id.toString(),
+              actionTarget: "answer",
+              authorId: user?.id as string,
+              session,
+            });
+          })
+        );
       }
     }
 
     await Question.findByIdAndDelete(questionId).session(session);
 
     // log the interaction
-    after(async () => {
-      await createInteraction({
-        action: "delete",
-        actionId: questionId,
-        actionTarget: "question",
-        authorId: user?.id as string,
-      });
+    await createInteraction({
+      action: "delete",
+      actionId: questionId,
+      actionTarget: "question",
+      authorId: user?.id as string,
+      session,
     });
 
     await session.commitTransaction();

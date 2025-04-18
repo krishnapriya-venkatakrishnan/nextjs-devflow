@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { deleteAnwer } from "@/lib/actions/answer.action";
+import { deleteAnswer } from "@/lib/actions/answer.action";
 import { deleteQuestion } from "@/lib/actions/question.action";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -46,7 +46,7 @@ const EditDeleteAction = ({ type, itemId }: Props) => {
       }
     } else {
       // Call action to delete the answer
-      const { success, error } = await deleteAnwer({ answerId: itemId });
+      const { success, error } = await deleteAnswer({ answerId: itemId });
 
       if (success) {
         toast({

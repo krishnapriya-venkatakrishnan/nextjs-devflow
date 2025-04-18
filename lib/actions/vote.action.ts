@@ -18,7 +18,6 @@ import { Answer, Question, Vote } from "@/database";
 import mongoose, { ClientSession } from "mongoose";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
-import { after } from "next/server";
 import { createInteraction } from "./interaction.action";
 
 async function updateVoteCount(
@@ -135,13 +134,12 @@ export async function createVote(
     }
 
     // log the interaction
-    after(async () => {
-      await createInteraction({
-        action: voteType,
-        actionId: targetId,
-        actionTarget: targetType,
-        authorId: contentAuthorId,
-      });
+    await createInteraction({
+      action: voteType,
+      actionId: targetId,
+      actionTarget: targetType,
+      authorId: contentAuthorId,
+      session,
     });
 
     await session.commitTransaction();
