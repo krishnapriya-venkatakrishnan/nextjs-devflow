@@ -7,13 +7,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { formUrlQuery, removeKeysFromUrlQuery } from "@/lib/url";
 
 const filters = [
-  { name: "React", value: "react" },
-  { name: "JavaScript", value: "javascript" },
-
-  // { name: "Newest", value: "newest" },
-  // { name: "Popular", value: "popular" },
-  // { name: "Unanswered", value: "unanswered" },
-  // { name: "Recommeded", value: "recommended" },
+  { name: "Newest", value: "newest" },
+  { name: "Popular", value: "popular" },
+  { name: "Unanswered", value: "unanswered" },
+  { name: "Recommeded", value: "recommended" },
 ];
 
 const HomeFilter = () => {
