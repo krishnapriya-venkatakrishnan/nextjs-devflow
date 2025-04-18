@@ -71,20 +71,22 @@ export const AskQuestionSchema = z.object({
 });
 
 export const UserSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  username: z.string().min(3, "Username must be at least 3 characters long."),
-  email: z.string().email("Invalid email address."),
+  name: z.string().min(1, { message: "Name is required." }),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long." }),
+  email: z.string().email({ message: "Invalid email address." }),
   bio: z.string().optional(),
-  image: z.string().url("Invalid image URL.").optional(),
+  image: z.string().url({ message: "Invalid image URL." }).optional(),
   location: z.string().optional(),
-  portfolio: z.string().url("Invalid portfolio URL.").optional(),
+  portfolio: z.string().url({ message: "Invalid portfolio URL." }).optional(),
   reputation: z.number().optional(),
 });
 
 export const AccountSchema = z.object({
-  userId: z.string(),
+  userId: z.string().min(1, { message: "User ID is required." }),
   name: z.string().min(1, { message: "Name is required." }),
-  image: z.string().url("Invalid image URL.").optional(),
+  image: z.string().url({ message: "Invalid image URL." }).optional(),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long." })
@@ -100,43 +102,52 @@ export const AccountSchema = z.object({
       message: "Password must contain at least one special character.",
     })
     .optional(),
-  provider: z.string().min(1, "Provider is required."),
-  providerAccountId: z.string().min(1, "Provider Account ID is required."),
+  provider: z.string().min(1, { message: "Provider is required." }),
+  providerAccountId: z
+    .string()
+    .min(1, { message: "Provider Account ID is required." }),
 });
 
 export const SignInWithOAuthSchema = z.object({
-  provider: z.enum(["github", "google"]),
-  providerAccountId: z.string().min(1, "Provider Account ID is required"),
+  provider: z.enum(["google", "github"]),
+  providerAccountId: z
+    .string()
+    .min(1, { message: "Provider Account ID is required" }),
   user: z.object({
-    name: z.string().min(1, "Name is required"),
-    username: z.string().min(3, "Username must be at least 3 characters."),
-    email: z.string().email("Invalid email address."),
-    image: z.string().url("Invalid image URL").optional(),
+    name: z.string().min(1, { message: "Name is required" }),
+    username: z
+      .string()
+      .min(3, { message: "Username must be at least 3 characters." }),
+    email: z.string().email({ message: "Invalid email address." }),
+    image: z.string().url({ message: "Invalid image URL" }).optional(),
   }),
 });
 
 export const EditQuestionSchema = AskQuestionSchema.extend({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const GetQuestionSchema = z.object({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const PaginatedSearchParamsSchema = z.object({
-  page: z.number().min(1, "Page must be at least 1").default(1),
-  pageSize: z.number().min(1, "Page size must be at least 1").default(10),
+  page: z.number().min(1, { message: "Page must be at least 1." }).default(1),
+  pageSize: z
+    .number()
+    .min(1, { message: "Page size must be at least 1." })
+    .default(10),
   query: z.string().optional(),
   filter: z.string().optional(),
   sort: z.string().optional(),
 });
 
 export const GetTagQuestionsSchema = PaginatedSearchParamsSchema.extend({
-  tagId: z.string().min(1, "Tag ID is required."),
+  tagId: z.string().min(1, { message: "Tag ID is required." }),
 });
 
 export const IncrementViewsSchema = z.object({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const AnswerSchema = z.object({
@@ -144,11 +155,11 @@ export const AnswerSchema = z.object({
 });
 
 export const AnswerServerSchema = AnswerSchema.extend({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const GetAnswersSchema = PaginatedSearchParamsSchema.extend({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const AIAnswerSchema = z.object({
@@ -165,7 +176,7 @@ export const AIAnswerSchema = z.object({
 });
 
 export const CreateVoteSchema = z.object({
-  targetId: z.string().min(1, "Target ID is required."),
+  targetId: z.string().min(1, { message: "Target ID is required." }),
   targetType: z.enum(["question", "answer"], {
     message: "Invalid target type. Must be 'question' or 'answer'.",
   }),
@@ -178,8 +189,8 @@ export const UpdateVoteCountSchema = CreateVoteSchema.extend({
   change: z
     .number()
     .int()
-    .min(-1, "Change must be -1 (decrement) or 1 (increment)")
-    .max(1, "Change must be -1 (decrement) or 1 (increment)"),
+    .min(-1, { message: "Change must be -1 (decrement) or 1 (increment)." })
+    .max(1, { message: "Change must be -1 (decrement) or 1 (increment)." }),
 });
 
 export const HasVotedSchema = CreateVoteSchema.pick({
@@ -188,36 +199,41 @@ export const HasVotedSchema = CreateVoteSchema.pick({
 });
 
 export const CollectionBaseSchema = z.object({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const GetUserSchema = z.object({
-  userId: z.string().min(1, "User ID is required."),
+  userId: z.string().min(1, { message: "User ID is required." }),
 });
 
 export const GetUserQuestionsSchema = PaginatedSearchParamsSchema.extend({
-  userId: z.string().min(1, "User ID is required."),
+  userId: z.string().min(1, { message: "User ID is required." }),
 });
 
 export const GetUserAnswersSchema = PaginatedSearchParamsSchema.extend({
-  userId: z.string().min(1, "User ID is required."),
+  userId: z.string().min(1, { message: "User ID is required." }),
 });
 
 export const GetUserTagsSchema = z.object({
-  userId: z.string().min(1, "User ID is required."),
+  userId: z.string().min(1, { message: "User ID is required." }),
 });
 
 export const DeleteQuestionSchema = z.object({
-  questionId: z.string().min(1, "Question ID is required."),
+  questionId: z.string().min(1, { message: "Question ID is required." }),
 });
 
 export const DeleteAnswerSchema = z.object({
-  answerId: z.string().min(1, "Answer ID is required."),
+  answerId: z.string().min(1, { message: "Answer ID is required." }),
 });
 
 export const CreateInteractionSchema = z.object({
-  action: z.enum(InteractionActionEnums),
-  actionTarget: z.enum(["question", "answer"]),
-  actionId: z.string().min(1),
-  authorId: z.string().min(1),
+  action: z.enum(InteractionActionEnums, {
+    message:
+      "Invalid action. Must be 'view', 'upvote', 'downvote', 'bookmark', 'post', 'edit', 'delete', 'search'.",
+  }),
+  actionTarget: z.enum(["question", "answer"], {
+    message: "Invalid action target. Must be 'question' or 'answer'.",
+  }),
+  actionId: z.string().min(1, { message: "Action ID is required." }),
+  authorId: z.string().min(1, { message: "Author ID is required." }),
 });
