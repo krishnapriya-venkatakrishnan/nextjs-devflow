@@ -72,7 +72,7 @@ export async function createAnswer(
     after(async () => {
       await createInteraction({
         action: "post",
-        actionId: newAnswer._id,
+        actionId: newAnswer._id.toString(),
         actionTarget: "answer",
         authorId: userId as string,
       });
