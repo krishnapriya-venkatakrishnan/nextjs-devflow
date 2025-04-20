@@ -25,11 +25,6 @@ export const sidebarLinks = [
     label: "Tags",
   },
   {
-    imgURL: "/icons/user.svg",
-    route: "/profile",
-    label: "Profile",
-  },
-  {
     imgURL: "/icons/question.svg",
     route: "/ask-question",
     label: "Ask a question",

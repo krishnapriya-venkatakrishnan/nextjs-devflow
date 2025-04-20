@@ -18,7 +18,12 @@ import { Answer, Question, Vote } from "@/database";
 import mongoose, { ClientSession } from "mongoose";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
-import { createInteraction } from "./interaction.action";
+import {
+  createInteraction,
+  deleteInteraction,
+  updateVoteInteraction,
+} from "./interaction.action";
+import { auth } from "@/auth";
 
 async function updateVoteCount(
   params: UpdateVoteCountParams,
@@ -82,6 +87,11 @@ export async function createVote(
     if (!contentDoc) throw new Error("Content not found");
     const contentAuthorId = contentDoc.author.toString();
 
+    const loggedInSession = await auth();
+    const loggedInUser = loggedInSession?.user?.id;
+
+    console.log("Fomr vote actions", contentAuthorId);
+
     const existingVote = await Vote.findOne({
       author: userId,
       actionId: targetId,
@@ -98,9 +108,17 @@ export async function createVote(
           { targetId, targetType, voteType, change: -1 },
           session
         );
+        await updateVoteInteraction({
+          action: `remove-${voteType}`,
+          actionId: targetId,
+          actionTarget: targetType,
+          authorId: contentAuthorId!,
+          voteAuthorId: loggedInUser!.toString(),
+          session,
+        });
       } else {
         // If the user is changing their vote, update voteType and adjust counts
-        await Vote.findByIdAndUpdate(
+        const vote = await Vote.findByIdAndUpdate(
           existingVote._id,
           { voteType },
           { new: true, session }
@@ -109,14 +127,32 @@ export async function createVote(
           { targetId, targetType, voteType: existingVote.voteType, change: -1 },
           session
         );
+        await updateVoteInteraction({
+          action: voteType === "upvote" ? "remove-downvote" : "remove-upvote",
+          actionId: targetId,
+          actionTarget: targetType,
+          authorId: contentAuthorId!,
+          voteAuthorId: loggedInUser!.toString(),
+          session,
+        });
+
         await updateVoteCount(
           { targetId, targetType, voteType, change: 1 },
           session
         );
+        // log the interaction
+        await createInteraction({
+          action: voteType,
+          actionId: targetId,
+          actionTarget: targetType,
+          authorId: contentAuthorId!,
+          voteAuthorId: loggedInUser!.toString(),
+          session,
+        });
       }
     } else {
       // First-time vote creation
-      await Vote.create(
+      const [vote] = await Vote.create(
         [
           {
             author: userId,
@@ -131,16 +167,17 @@ export async function createVote(
         { targetId, targetType, voteType, change: 1 },
         session
       );
+      console.log("create vote");
+      // log the interaction
+      await createInteraction({
+        action: voteType,
+        actionId: targetId,
+        actionTarget: targetType,
+        authorId: contentAuthorId!,
+        voteAuthorId: loggedInUser!.toString(),
+        session,
+      });
     }
-
-    // log the interaction
-    await createInteraction({
-      action: voteType,
-      actionId: targetId,
-      actionTarget: targetType,
-      authorId: contentAuthorId,
-      session,
-    });
 
     await session.commitTransaction();
     revalidatePath(ROUTES.QUESTION(targetId));

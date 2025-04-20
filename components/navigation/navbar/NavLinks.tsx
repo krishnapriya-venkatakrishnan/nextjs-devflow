@@ -25,14 +25,6 @@ const NavLinks = ({
           (pathName.includes(item.route) && item.route.length > 1) ||
           pathName === item.route;
 
-        if (item.route === "/profile") {
-          if (userId) {
-            item.route = `${item.route}/${userId}`;
-          } else {
-            return null;
-          }
-        }
-
         const LinkComponent = (
           <Link
             href={item.route}

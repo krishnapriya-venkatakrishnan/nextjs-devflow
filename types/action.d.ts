@@ -105,15 +105,33 @@ interface CreateInteractionParams {
     | "bookmark"
     | "post"
     | "edit"
-    | "delete"
     | "search";
   actionId: string;
   authorId: string;
   actionTarget: "question" | "answer";
+  voteAuthorId?: string;
+}
+
+interface DeleteInteractionParams {
+  action: "remove-upvote" | "remove-downvote" | "remove-bookmark" | "delete";
+  actionId: string;
+  authorId: string;
+  actionTarget: "question" | "answer";
+  voteAuthorId?: string;
 }
 
 interface UpdateReputationParams {
   interaction: IInteractionDoc;
+  session: mongoose.ClientSession;
+  performerId: string;
+  authorId: string;
+}
+
+interface DeleteReputationParams {
+  interaction: {
+    action: string;
+    actionType: string;
+  };
   session: mongoose.ClientSession;
   performerId: string;
   authorId: string;

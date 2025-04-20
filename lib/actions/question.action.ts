@@ -33,7 +33,7 @@ import {
 import dbConnect from "../mongoose";
 import { Answer, Collection, Interaction, Vote } from "@/database";
 import { revalidatePath } from "next/cache";
-import { createInteraction } from "./interaction.action";
+import { createInteraction, deleteInteraction } from "./interaction.action";
 import { auth } from "@/auth";
 
 export async function createQuestion(
@@ -460,6 +460,47 @@ export async function deleteQuestion(
         actionId: questionId,
         actionType: "question",
       }).session(session);
+
+      if (question.upvotes) {
+        const interactions = await Interaction.find({
+          action: "upvote",
+          actionId: questionId,
+          actionType: "question",
+        }).session(session);
+        await Promise.all(
+          interactions.map((interaction) =>
+            deleteInteraction({
+              action: "remove-upvote",
+              actionId: questionId,
+              actionTarget: "question",
+              authorId: interaction.user.toString(),
+              voteAuthorId: interaction.voteAuthorId.toString(),
+              session,
+            })
+          )
+        );
+      }
+      console.log("Downvotes", question.downvotes);
+      if (question.downvotes) {
+        const interactions = await Interaction.find({
+          action: "downvote",
+          actionId: questionId,
+          actionType: "question",
+        }).session(session);
+        console.log("Interactions to delete", interactions);
+        await Promise.all(
+          interactions.map((interaction) =>
+            deleteInteraction({
+              action: "remove-downvote",
+              actionId: questionId,
+              actionTarget: "question",
+              authorId: interaction.user.toString(),
+              voteAuthorId: interaction.voteAuthorId.toString(),
+              session,
+            })
+          )
+        );
+      }
     }
 
     // If there are answers posted for the question, find the Answer documents and delete its related Vote documents. Finally delete the Answer documents.
@@ -477,8 +518,49 @@ export async function deleteQuestion(
         }).session(session);
 
         await Promise.all(
-          answers.map((ans) => {
-            createInteraction({
+          answers.map(async (ans) => {
+            if (ans.upvotes) {
+              const interactions = await Interaction.find({
+                action: "upvote",
+                actionId: ans._id.toString(),
+                actionType: "answer",
+              }).session(session);
+              console.log("Upvote Interactions to delete", interactions);
+              await Promise.all(
+                interactions.map((interaction) =>
+                  deleteInteraction({
+                    action: "remove-upvote",
+                    actionId: ans._id.toString(),
+                    actionTarget: "answer",
+                    authorId: interaction.user.toString(),
+                    voteAuthorId: interaction.voteAuthorId.toString(),
+                    session,
+                  })
+                )
+              );
+            }
+            if (ans.downvotes) {
+              const interactions = await Interaction.find({
+                action: "downvote",
+                actionId: ans._id.toString(),
+                actionType: "answer",
+              }).session(session);
+              console.log("Downvote Interactions to delete", interactions);
+              await Promise.all(
+                interactions.map((interaction) =>
+                  deleteInteraction({
+                    action: "remove-downvote",
+                    actionId: ans._id.toString(),
+                    actionTarget: "answer",
+                    authorId: interaction.user.toString(),
+                    voteAuthorId: interaction.voteAuthorId.toString(),
+                    session,
+                  })
+                )
+              );
+            }
+
+            await deleteInteraction({
               action: "delete",
               actionId: ans._id.toString(),
               actionTarget: "answer",
@@ -493,7 +575,7 @@ export async function deleteQuestion(
     await Question.findByIdAndDelete(questionId).session(session);
 
     // log the interaction
-    await createInteraction({
+    await deleteInteraction({
       action: "delete",
       actionId: questionId,
       actionTarget: "question",

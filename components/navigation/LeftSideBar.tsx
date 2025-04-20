@@ -1,13 +1,13 @@
-import { LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import ROUTES from "@/constants/routes";
 
 import NavLinks from "./navbar/NavLinks";
 import { Button } from "../ui/button";
+import LogoutButton from "../LogoutButton";
 
 const LeftSidebar = async () => {
   const session = await auth();
@@ -21,22 +21,7 @@ const LeftSidebar = async () => {
 
       <div className="flex flex-col gap-3">
         {userId ? (
-          <form
-            action={async () => {
-              "use server";
-              await signOut();
-            }}
-          >
-            <Button
-              type="submit"
-              className="base-medium w-fit !bg-transparent px-4 py-3"
-            >
-              <LogOut className="size-5 text-black dark:text-white" />
-              <span className="text-dark300_light900 max-lg:hidden">
-                Logout
-              </span>
-            </Button>
-          </form>
+          <LogoutButton />
         ) : (
           <>
             <Button

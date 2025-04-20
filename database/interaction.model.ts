@@ -5,6 +5,7 @@ export interface IInteraction {
   action: string;
   actionId: Types.ObjectId;
   actionType: string;
+  voteAuthorId?: Types.ObjectId;
 }
 
 export const InteractionActionEnums = [
@@ -16,6 +17,9 @@ export const InteractionActionEnums = [
   "edit",
   "delete",
   "search",
+  "remove-upvote",
+  "remove-downvote",
+  "remove-bookmark",
 ] as const;
 
 export interface IInteractionDoc extends IInteraction, Document {}
@@ -26,6 +30,7 @@ const InteractionSchema = new Schema<IInteraction>(
     action: { type: String, enum: InteractionActionEnums, required: true },
     actionId: { type: Schema.Types.ObjectId, required: true }, // questionId or answerId
     actionType: { type: String, enum: ["question", "answer"], required: true },
+    voteAuthorId: { type: Schema.Types.ObjectId, ref: "Vote" },
   },
   {
     timestamps: true,

@@ -227,10 +227,28 @@ export const DeleteAnswerSchema = z.object({
 });
 
 export const CreateInteractionSchema = z.object({
-  action: z.enum(InteractionActionEnums, {
-    message:
-      "Invalid action. Must be 'view', 'upvote', 'downvote', 'bookmark', 'post', 'edit', 'delete', 'search'.",
+  action: z.enum(
+    ["view", "upvote", "downvote", "bookmark", "post", "edit", "search"],
+    {
+      message:
+        "Invalid action. Must be 'view', 'upvote', 'downvote', 'bookmark', 'post', 'edit', 'search'.",
+    }
+  ),
+  actionTarget: z.enum(["question", "answer"], {
+    message: "Invalid action target. Must be 'question' or 'answer'.",
   }),
+  actionId: z.string().min(1, { message: "Action ID is required." }),
+  authorId: z.string().min(1, { message: "Author ID is required." }),
+});
+
+export const DeleteInteractionSchema = z.object({
+  action: z.enum(
+    ["remove-upvote", "remove-downvote", "remove-bookmark", "delete"],
+    {
+      message:
+        "Invalid action. Must be 'remove-upvote', 'remove-downvote', 'remove-bookmark', 'delete'.",
+    }
+  ),
   actionTarget: z.enum(["question", "answer"], {
     message: "Invalid action target. Must be 'question' or 'answer'.",
   }),

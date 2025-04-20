@@ -19,10 +19,10 @@ import {
 } from "../validation";
 import handleError from "../handlers/error";
 import mongoose from "mongoose";
-import { Question, Vote } from "@/database";
+import { Interaction, Question, Vote } from "@/database";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
-import { createInteraction } from "./interaction.action";
+import { createInteraction, deleteInteraction } from "./interaction.action";
 
 export async function createAnswer(
   params: CreateAnswerParams
@@ -192,16 +192,56 @@ export async function deleteAnswer(
         actionId: answerId,
         actionType: "answer",
       }).session(session);
+
+      if (answer.upvotes) {
+        const interactions = await Interaction.find({
+          action: "upvote",
+          actionId: answerId,
+          actionType: "answer",
+        }).session(session);
+        await Promise.all(
+          interactions.map((interaction) => {
+            deleteInteraction({
+              action: "remove-upvote",
+              actionId: answerId,
+              actionTarget: "answer",
+              authorId: interaction.user.toString(),
+              voteAuthorId: interaction.voteAuthorId.toString(),
+              session,
+            });
+          })
+        );
+      }
+
+      if (answer.downvotes) {
+        const interactions = await Interaction.find({
+          action: "downvote",
+          actionId: answerId,
+          actionType: "answer",
+        }).session(session);
+        await Promise.all(
+          interactions.map((interaction) => {
+            deleteInteraction({
+              action: "remove-downvote",
+              actionId: answerId,
+              actionTarget: "answer",
+              authorId: interaction.user.toString(),
+              voteAuthorId: interaction.voteAuthorId.toString(),
+              session,
+            });
+          })
+        );
+      }
     }
 
     await Answer.findByIdAndDelete(answerId).session(session);
 
     // log the interaction
-    await createInteraction({
+    await deleteInteraction({
       action: "delete",
       actionId: answerId,
       actionTarget: "answer",
-      authorId: user?.id as string,
+      authorId: answer.author.toString(),
       session,
     });
 
