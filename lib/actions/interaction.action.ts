@@ -28,8 +28,6 @@ export async function createInteraction(
   const authSession = await auth();
   const loggedInUser = authSession?.user?.id;
 
-  console.log("check");
-  console.log(voteAuthorId);
   try {
     const [interaction] = await Interaction.create(
       [
@@ -82,7 +80,6 @@ async function updateReputation(params: UpdateReputationParams) {
       break;
   }
 
-  console.log(performerId, authorId);
   if (performerId === authorId) {
     await User.findByIdAndUpdate(
       performerId,
@@ -143,7 +140,6 @@ export async function deleteInteraction(
       authorId: voteAuthorId ? loggedInUser! : authorId,
     });
 
-    console.log(actionType, actionId, actionTarget);
     switch (actionType) {
       case "remove-upvote":
         await Interaction.findOneAndDelete(
@@ -213,7 +209,6 @@ async function deleteReputation(params: DeleteReputationParams) {
       break;
   }
 
-  console.log(performerId, authorId);
   if (performerId === authorId) {
     await User.findByIdAndUpdate(
       performerId,
@@ -274,7 +269,6 @@ export async function updateVoteInteraction(
       authorId,
     });
 
-    console.log(actionType, actionId, actionTarget);
     switch (actionType) {
       case "remove-upvote":
         await Interaction.findOneAndDelete(

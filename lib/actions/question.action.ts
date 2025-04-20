@@ -480,14 +480,13 @@ export async function deleteQuestion(
           )
         );
       }
-      console.log("Downvotes", question.downvotes);
+
       if (question.downvotes) {
         const interactions = await Interaction.find({
           action: "downvote",
           actionId: questionId,
           actionType: "question",
         }).session(session);
-        console.log("Interactions to delete", interactions);
         await Promise.all(
           interactions.map((interaction) =>
             deleteInteraction({
@@ -525,7 +524,6 @@ export async function deleteQuestion(
                 actionId: ans._id.toString(),
                 actionType: "answer",
               }).session(session);
-              console.log("Upvote Interactions to delete", interactions);
               await Promise.all(
                 interactions.map((interaction) =>
                   deleteInteraction({
@@ -545,7 +543,6 @@ export async function deleteQuestion(
                 actionId: ans._id.toString(),
                 actionType: "answer",
               }).session(session);
-              console.log("Downvote Interactions to delete", interactions);
               await Promise.all(
                 interactions.map((interaction) =>
                   deleteInteraction({

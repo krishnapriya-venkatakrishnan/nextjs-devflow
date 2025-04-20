@@ -18,11 +18,7 @@ import { Answer, Question, Vote } from "@/database";
 import mongoose, { ClientSession } from "mongoose";
 import { revalidatePath } from "next/cache";
 import ROUTES from "@/constants/routes";
-import {
-  createInteraction,
-  deleteInteraction,
-  updateVoteInteraction,
-} from "./interaction.action";
+import { createInteraction, updateVoteInteraction } from "./interaction.action";
 import { auth } from "@/auth";
 
 async function updateVoteCount(
@@ -89,8 +85,6 @@ export async function createVote(
 
     const loggedInSession = await auth();
     const loggedInUser = loggedInSession?.user?.id;
-
-    console.log("Fomr vote actions", contentAuthorId);
 
     const existingVote = await Vote.findOne({
       author: userId,
@@ -167,7 +161,7 @@ export async function createVote(
         { targetId, targetType, voteType, change: 1 },
         session
       );
-      console.log("create vote");
+
       // log the interaction
       await createInteraction({
         action: voteType,
