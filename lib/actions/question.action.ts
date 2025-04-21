@@ -236,13 +236,24 @@ export async function getRecommendedQuestions({
   const interactions = await Interaction.find({
     user: new Types.ObjectId(userId),
     actionType: "question",
-    action: { $in: ["view", "upvote", "bookmark", "post"] },
+    action: { $in: ["view", "bookmark", "post"] },
   })
     .sort({ createdAt: -1 })
     .limit(50)
     .lean();
 
-  const interactedQuestionIds = interactions.map((i) => i.actionId);
+  const voteInteractions = await Interaction.find({
+    voteAuthorId: new Types.ObjectId(userId),
+    actionType: "question",
+    action: { $in: ["upvote"] },
+  })
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean();
+
+  const totalInteractions = [...interactions, ...voteInteractions];
+
+  const interactedQuestionIds = totalInteractions.map((i) => i.actionId);
   const interactedQuestions = await Question.find({
     _id: { $in: interactedQuestionIds },
   }).select("tags");
