@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import Image from "next/image";
 
 interface Filter {
   name: string;
@@ -21,12 +22,14 @@ interface Props {
   filters: Filter[];
   otherClasses?: string;
   containerClasses?: string;
+  jobFilter?: boolean;
 }
 
 const CommonFilter = ({
   filters,
   otherClasses = "",
   containerClasses = "",
+  jobFilter = false,
 }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -56,7 +59,19 @@ const CommonFilter = ({
           aria-label="Filter options"
         >
           <div className="line-clamp-1 flex-1 text-left">
-            <SelectValue placeholder="Select a filter" />
+            {jobFilter ? (
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/icons/location.svg"
+                  alt="location"
+                  height={24}
+                  width={24}
+                />
+                <SelectValue placeholder="Select Location" />
+              </div>
+            ) : (
+              <SelectValue placeholder="Select a filter" />
+            )}
           </div>
         </SelectTrigger>
         <SelectContent>
