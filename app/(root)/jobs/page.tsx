@@ -1,9 +1,8 @@
 import JobListingCard from "@/components/cards/JobListingCard";
 import CommonFilter from "@/components/filters/CommonFilter";
 import LocalSearch from "@/components/search/LocalSearch";
-import { HomePageFilters } from "@/constants/filters";
 import ROUTES from "@/constants/routes";
-import { getJobLocation } from "@/lib/actions/job.action";
+import { getCountries } from "@/lib/actions/job.action";
 
 const FindJobs = async () => {
   const jobListings = [
@@ -49,7 +48,7 @@ const FindJobs = async () => {
   ];
 
   const { filters: jobFilterLocations, sortedFlags: flagDetails } =
-    await getJobLocation();
+    await getCountries();
 
   return (
     <section>

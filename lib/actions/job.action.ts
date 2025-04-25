@@ -1,8 +1,22 @@
 "use server";
 
 import { filterProps, getCountriesProps } from "@/types/action";
+import { cache } from "react";
 
-export async function getJobLocation(): Promise<{
+const callCountriesApi = cache(async function callCountriesApi() {
+  const res = await fetch(
+    `https://restcountries.com/v3.1/all?fields=name,flags`,
+    {
+      next: {
+        revalidate: 120,
+      },
+    }
+  );
+  const data = await res.json();
+  return data;
+});
+
+export async function getCountries(): Promise<{
   filters: filterProps[];
   sortedFlags: Record<string, string>;
 }> {
@@ -13,10 +27,7 @@ export async function getJobLocation(): Promise<{
   const filters: filterProps[] = [];
   const flags: Record<string, string> = {};
 
-  const res = await fetch(
-    `https://restcountries.com/v3.1/all?fields=name,flags`
-  );
-  const data = await res.json();
+  const data = await callCountriesApi();
   await Promise.all(
     data.map((item: getCountriesProps) => {
       filters.push({
