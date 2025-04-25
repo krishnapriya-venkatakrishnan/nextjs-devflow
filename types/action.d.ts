@@ -143,3 +143,18 @@ interface RecommendationParams {
   skip: number;
   limit: number;
 }
+
+interface getCountriesProps {
+  flags: {
+    svg: string;
+    png: string;
+  };
+  name: {
+    common: string;
+  };
+}
+
+interface filterProps {
+  name: string;
+  value: string;
+}

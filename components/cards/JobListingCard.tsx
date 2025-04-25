@@ -8,7 +8,10 @@ interface Props {
   description: string;
   type: string;
   salary: string;
-  location: string;
+  city: string;
+  state: string;
+  country: string;
+  flag: string;
   href: string;
 }
 
@@ -18,12 +21,32 @@ const JobListingCard = ({
   description,
   type,
   salary,
-  location,
+  city,
+  state,
+  country,
+  flag,
   href,
 }: Props) => {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">{location}</div>
+    <div className="flex flex-col gap-4 shadow-md px-4">
+      <div className="flex justify-end gap-2">
+        {flag && (
+          <Image
+            src={flag}
+            alt={country}
+            height={10}
+            width={25}
+            className="rounded-full"
+          />
+        )}
+        {city
+          ? state
+            ? `${city}, ${state}, ${country}`
+            : `${city}, ${country}`
+          : state
+            ? `${state}, ${country}`
+            : `${country}`}
+      </div>
       <div className="flex-1">
         <Image src={logo} alt="job logo" height={70} width={70} />
       </div>
