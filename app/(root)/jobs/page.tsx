@@ -1,8 +1,10 @@
 import JobListingCard from "@/components/cards/JobListingCard";
+import DataRenderer from "@/components/DataRenderer";
 import CommonFilter from "@/components/filters/CommonFilter";
 import Pagination from "@/components/Pagination";
 import LocalSearch from "@/components/search/LocalSearch";
 import ROUTES from "@/constants/routes";
+import { EMPTY_JOBS } from "@/constants/states";
 import { getJobFilters, getJobListings } from "@/lib/actions/job.action";
 import { RouteParams } from "@/types/global";
 
@@ -28,12 +30,12 @@ const FindJobs = async ({ searchParams }: RouteParams) => {
   return (
     <section>
       <h1 className="text-4xl font-bold">Jobs in Sweden</h1>
-      <div className="flex max-md:flex-col gap-6">
+      <div className="flex max-md:flex-col gap-6 mt-6">
         <LocalSearch
           route={ROUTES.JOBS}
           imgSrc="/icons/search.svg"
           placeholder="Search in ad headline, ad description and employer name"
-          otherClasses=" pl-6"
+          otherClasses="pl-6"
         />
         <CommonFilter
           filters={jobFilterLocations}
@@ -42,34 +44,41 @@ const FindJobs = async ({ searchParams }: RouteParams) => {
           jobFilter={true}
         />
       </div>
-      <div className="flex flex-col gap-10 mt-10 px-6">
-        {listings.map(
-          (
-            {
-              logo_url,
-              headline,
-              description,
-              employment_type,
-              salary_type,
-              workplace_address,
-              webpage_url,
-            },
-            index
-          ) => (
-            <JobListingCard
-              key={index}
-              logo={logo_url}
-              title={headline}
-              description={description.text}
-              type={employment_type.label}
-              salary={salary_type.label}
-              municipality={workplace_address.municipality}
-              region={workplace_address.region}
-              href={webpage_url}
-            />
-          )
+      <DataRenderer
+        success={true}
+        data={listings}
+        empty={EMPTY_JOBS}
+        render={(listings) => (
+          <div className="mt-10 flex w-full flex-col gap-6">
+            {listings.map(
+              (
+                {
+                  logo_url,
+                  headline,
+                  description,
+                  employment_type,
+                  salary_type,
+                  workplace_address,
+                  webpage_url,
+                },
+                index
+              ) => (
+                <JobListingCard
+                  key={index}
+                  logo={logo_url}
+                  title={headline}
+                  description={description.text}
+                  type={employment_type.label}
+                  salary={salary_type.label}
+                  municipality={workplace_address.municipality}
+                  region={workplace_address.region}
+                  href={webpage_url}
+                />
+              )
+            )}
+          </div>
         )}
-      </div>
+      />
 
       <Pagination page={page} isNext={isNext || false} />
     </section>

@@ -28,6 +28,7 @@ export async function getJobFilters(
       };
     })
   );
+  result.sort((a: FilterProps, b: FilterProps) => a.name.localeCompare(b.name));
   return [{ name: "All", value: "all" }, ...result];
 }
 
