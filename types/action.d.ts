@@ -145,7 +145,6 @@ interface RecommendationParams {
 }
 
 interface GetMunicipalitiesProps {
-  "taxonomy/definition": string;
   "taxonomy/id": string;
 }
 

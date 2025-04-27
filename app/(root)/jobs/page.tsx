@@ -3,13 +3,21 @@ import CommonFilter from "@/components/filters/CommonFilter";
 import Pagination from "@/components/Pagination";
 import LocalSearch from "@/components/search/LocalSearch";
 import ROUTES from "@/constants/routes";
-import { getMunicipalities, getJobListings } from "@/lib/actions/job.action";
+import { getJobFilters, getJobListings } from "@/lib/actions/job.action";
 import { RouteParams } from "@/types/global";
 
 const FindJobs = async ({ searchParams }: RouteParams) => {
-  const { filters: jobFilterLocations } = await getMunicipalities();
-
   const { page, pageSize, query, filter } = await searchParams;
+  const { listings: municipalityListings } = await getJobListings({
+    page: Number(page) || 1,
+    pageSize: 10,
+  });
+  const municipalitiesArray = municipalityListings.map(
+    (item) => item.workplace_address.municipality
+  );
+  const sortedMunicipalitiesArray = [...new Set(municipalitiesArray)];
+  const jobFilterLocations = await getJobFilters(sortedMunicipalitiesArray);
+
   const { listings, isNext } = await getJobListings({
     page: Number(page) || 1,
     pageSize: 10,
@@ -24,7 +32,7 @@ const FindJobs = async ({ searchParams }: RouteParams) => {
         <LocalSearch
           route={ROUTES.JOBS}
           imgSrc="/icons/search.svg"
-          placeholder="Job Title, Company, or Keywords"
+          placeholder="Search in ad headline, ad description and employer name"
           otherClasses=" pl-6"
         />
         <CommonFilter
