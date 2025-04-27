@@ -1,58 +1,25 @@
 import JobListingCard from "@/components/cards/JobListingCard";
 import CommonFilter from "@/components/filters/CommonFilter";
+import Pagination from "@/components/Pagination";
 import LocalSearch from "@/components/search/LocalSearch";
 import ROUTES from "@/constants/routes";
-import { getCountries } from "@/lib/actions/job.action";
+import { getMunicipalities, getJobListings } from "@/lib/actions/job.action";
+import { RouteParams } from "@/types/global";
 
-const FindJobs = async () => {
-  const jobListings = [
-    {
-      logo: "/images/site-logo.svg",
-      title: "Seasonal Team Member",
-      description:
-        "As a team member, you're fully immersed in the spirit of the establishment. You're high functioning, adaptable, and ready",
-      type: "Full-time",
-      salary: "Not disclosed",
-      // location: "Vienna, Virginia, US",
-      city: "Vienna",
-      state: "Virginia",
-      country: "United States",
-      href: ROUTES.JOBS,
-    },
-    {
-      logo: "/images/site-logo.svg",
-      title: "Seasonal Team Member",
-      description:
-        "As a team member, you're fully immersed in the spirit of the establishment. You're high functioning, adaptable, and ready",
-      type: "Full-time",
-      salary: "Not disclosed",
-      // location: "Vienna, Virginia, US",
-      city: "Vienna",
-      state: "Virginia",
-      country: "United States",
-      href: ROUTES.JOBS,
-    },
-    {
-      logo: "/images/site-logo.svg",
-      title: "Seasonal Team Member",
-      description:
-        "As a team member, you're fully immersed in the spirit of the establishment. You're high functioning, adaptable, and ready",
-      type: "Full-time and Part-time",
-      salary: "Not disclosed",
-      // location: "Vienna, Virginia, US",
-      city: "Vienna",
-      state: "Virginia",
-      country: "United States",
-      href: ROUTES.JOBS,
-    },
-  ];
+const FindJobs = async ({ searchParams }: RouteParams) => {
+  const { filters: jobFilterLocations } = await getMunicipalities();
 
-  const { filters: jobFilterLocations, sortedFlags: flagDetails } =
-    await getCountries();
+  const { page, pageSize, query, filter } = await searchParams;
+  const { listings, isNext } = await getJobListings({
+    page: Number(page) || 1,
+    pageSize: 10,
+    filter,
+    query,
+  });
 
   return (
     <section>
-      <h1 className="text-4xl font-bold">Jobs</h1>
+      <h1 className="text-4xl font-bold">Jobs in Sweden</h1>
       <div className="flex max-md:flex-col gap-6">
         <LocalSearch
           route={ROUTES.JOBS}
@@ -68,37 +35,35 @@ const FindJobs = async () => {
         />
       </div>
       <div className="flex flex-col gap-10 mt-10 px-6">
-        {jobListings.map(
+        {listings.map(
           (
             {
-              logo,
-              title,
+              logo_url,
+              headline,
               description,
-              type,
-              salary,
-              city,
-              state,
-              country,
-              href,
+              employment_type,
+              salary_type,
+              workplace_address,
+              webpage_url,
             },
             index
           ) => (
             <JobListingCard
               key={index}
-              logo={logo}
-              title={title}
-              description={description}
-              type={type}
-              salary={salary}
-              city={city}
-              state={state}
-              country={country}
-              flag={flagDetails[country]}
-              href={href}
+              logo={logo_url}
+              title={headline}
+              description={description.text}
+              type={employment_type.label}
+              salary={salary_type.label}
+              municipality={workplace_address.municipality}
+              region={workplace_address.region}
+              href={webpage_url}
             />
           )
         )}
       </div>
+
+      <Pagination page={page} isNext={isNext || false} />
     </section>
   );
 };

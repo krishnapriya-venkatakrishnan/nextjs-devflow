@@ -3,15 +3,13 @@ import Link from "next/link";
 import React from "react";
 
 interface Props {
-  logo: string;
+  logo?: string;
   title: string;
   description: string;
   type: string;
   salary: string;
-  city: string;
-  state: string;
-  country: string;
-  flag: string;
+  municipality: string;
+  region: string;
   href: string;
 }
 
@@ -21,34 +19,17 @@ const JobListingCard = ({
   description,
   type,
   salary,
-  city,
-  state,
-  country,
-  flag,
+  municipality,
+  region,
   href,
 }: Props) => {
   return (
     <div className="flex flex-col gap-4 shadow-md px-4">
       <div className="flex justify-end gap-2">
-        {flag && (
-          <Image
-            src={flag}
-            alt={country}
-            height={10}
-            width={25}
-            className="rounded-full"
-          />
-        )}
-        {city
-          ? state
-            ? `${city}, ${state}, ${country}`
-            : `${city}, ${country}`
-          : state
-            ? `${state}, ${country}`
-            : `${country}`}
+        {`${municipality}, ${region}`}
       </div>
       <div className="flex-1">
-        <Image src={logo} alt="job logo" height={70} width={70} />
+        {logo && <Image src={logo} alt="job logo" height={70} width={70} />}
       </div>
       <div className="text-xl font-bold">{title}</div>
       <div>
@@ -77,7 +58,11 @@ const JobListingCard = ({
             {salary}
           </div>
         </div>
-        <Link href={href} className="text-primary-100 mr-4 gap-2 flex py-6">
+        <Link
+          href={href}
+          target="_blank"
+          className="text-primary-100 mr-4 gap-2 flex py-6"
+        >
           View job
           <Image
             src="/icons/arrow-up-right.svg"

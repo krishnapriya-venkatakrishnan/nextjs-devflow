@@ -144,17 +144,22 @@ interface RecommendationParams {
   limit: number;
 }
 
-interface getCountriesProps {
-  flags: {
-    svg: string;
-    png: string;
-  };
-  name: {
-    common: string;
-  };
+interface GetMunicipalitiesProps {
+  "taxonomy/definition": string;
+  "taxonomy/id": string;
 }
 
-interface filterProps {
+interface FilterProps {
   name: string;
   value: string;
+}
+
+interface GetJobListingsProps {
+  logo_url?: string;
+  headline: string;
+  description: Record<string, string>;
+  employment_type: Record<string, string>;
+  salary_type: Record<string, string>;
+  workplace_address: Record<string, string>;
+  webpage_url: string;
 }

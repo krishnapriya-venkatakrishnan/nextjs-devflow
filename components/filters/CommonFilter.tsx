@@ -67,7 +67,7 @@ const CommonFilter = ({
                   height={24}
                   width={24}
                 />
-                <SelectValue placeholder="Select Location" />
+                <SelectValue placeholder="Select a municipality" />
               </div>
             ) : (
               <SelectValue placeholder="Select a filter" />

@@ -1,14 +1,19 @@
 "use server";
 
-import { filterProps, getCountriesProps } from "@/types/action";
+import {
+  FilterProps,
+  GetJobListingsProps,
+  GetMunicipalitiesProps,
+} from "@/types/action";
+import { PaginatedSearchParams } from "@/types/global";
 import { cache } from "react";
 
-const callCountriesApi = cache(async function callCountriesApi() {
+const getMunicipalitiesApi = cache(async function getMunicipalitiesApi() {
   const res = await fetch(
-    `https://restcountries.com/v3.1/all?fields=name,flags`,
+    `https://taxonomy.api.jobtechdev.se/v1/taxonomy/specific/concepts/municipality`,
     {
       next: {
-        revalidate: 120,
+        revalidate: 86400,
       },
     }
   );
@@ -16,38 +21,63 @@ const callCountriesApi = cache(async function callCountriesApi() {
   return data;
 });
 
-export async function getCountries(): Promise<{
-  filters: filterProps[];
-  sortedFlags: Record<string, string>;
+export async function getMunicipalities(): Promise<{
+  filters: FilterProps[];
 }> {
-  // fetch the countries list
-  // return 2 values.
-  // 1. an array of objects- name and value pair- for filter
-  // 2. an object- countryName and countryFlag- for displaying the flag in the job listing card.
-  const filters: filterProps[] = [];
-  const flags: Record<string, string> = {};
+  const filters: FilterProps[] = [];
 
-  const data = await callCountriesApi();
+  const data = await getMunicipalitiesApi();
   await Promise.all(
-    data.map((item: getCountriesProps) => {
+    data.map((item: GetMunicipalitiesProps) => {
       filters.push({
-        name: item.name.common,
-        value: item.name.common,
+        name: item["taxonomy/definition"],
+        value: item["taxonomy/id"],
       });
-
-      flags[item.name.common] = item.flags.png;
     })
   );
 
-  filters.sort((a: filterProps, b: filterProps) =>
+  filters.sort((a: FilterProps, b: FilterProps) =>
     a.name.localeCompare(b.name)
-  );
-  const sortedFlags: Record<string, string> = Object.fromEntries(
-    Object.entries(flags).sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
   );
 
   return {
     filters,
-    sortedFlags,
+  };
+}
+
+const callJobListingsApi = cache(async function callJobListingsApi(
+  pageSize: number,
+  offset: number,
+  query?: string,
+  filter?: string
+) {
+  let searchString = `limit=${pageSize}&offset=${offset}`;
+
+  if (query) searchString += `&q=${query}`;
+
+  if (filter) searchString += `&municipality=${filter}`;
+
+  const url = `https://jobsearch.api.jobtechdev.se/search?${searchString}`;
+
+  try {
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+export async function getJobListings(params: PaginatedSearchParams): Promise<{
+  listings: GetJobListingsProps[];
+  isNext: boolean;
+}> {
+  const { page, pageSize, filter, query } = params;
+  const offset = (page! - 1) * 10;
+  const data = await callJobListingsApi(pageSize!, offset, query, filter);
+
+  return {
+    listings: data.hits,
+    isNext: data.total.value > page! * 10,
   };
 }

@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "flagcdn.com",
+        hostname: "arbetsformedlingen.se",
         port: "",
       },
     ],
