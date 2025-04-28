@@ -88,3 +88,8 @@ interface Badges {
   SILVER: number;
   BRONZE: number;
 }
+
+interface GlobalSearchParams {
+  global?: string;
+  type?: string;
+}

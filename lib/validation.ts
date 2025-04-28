@@ -255,3 +255,8 @@ export const DeleteInteractionSchema = z.object({
   actionId: z.string().min(1, { message: "Action ID is required." }),
   authorId: z.string().min(1, { message: "Author ID is required." }),
 });
+
+export const GlobalSearchSchema = z.object({
+  global: z.string().optional(),
+  type: z.string().optional(),
+});

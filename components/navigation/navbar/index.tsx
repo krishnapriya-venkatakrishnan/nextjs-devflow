@@ -6,6 +6,8 @@ import UserAvatar from "@/components/UserAvatar";
 
 import MobileNavigation from "./MobileNavigation";
 import Theme from "./Theme";
+import GlobalSearch from "@/components/search/GlobalSearch";
+import ROUTES from "@/constants/routes";
 
 const Navbar = async () => {
   const session = await auth();
@@ -22,7 +24,10 @@ const Navbar = async () => {
           Dev <span className="text-primary-100">Flow</span>
         </p>
       </Link>
-      <p>Global search bar</p>
+      <GlobalSearch
+        imgSrc="/icons/search.svg"
+        placeholder="Search anything globally..."
+      />
       <div className="flex-between gap-5">
         <Theme />
         {session?.user?.id && (
