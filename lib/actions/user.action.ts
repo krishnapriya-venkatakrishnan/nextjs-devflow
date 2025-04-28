@@ -16,6 +16,7 @@ import {
   GetUserSchema,
   GetUserTagsSchema,
   PaginatedSearchParamsSchema,
+  UserProfileSchema,
 } from "../validation";
 import handleError from "../handlers/error";
 import { FilterQuery, PipelineStage, Types } from "mongoose";
@@ -25,6 +26,7 @@ import {
   GetUserParams,
   GetUserQuestionsParams,
   GetUserTagsParams,
+  UpdateUserProfile,
 } from "@/types/action";
 import { assignBadges } from "../utils";
 
@@ -333,6 +335,35 @@ export async function getUserStats(params: GetUserParams): Promise<
         totalQuestions: questionStats?.count,
         totalAnswers: answerStats?.count,
         badges,
+      },
+    };
+  } catch (error) {
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+export async function updateUser(
+  params: UpdateUserProfile
+): Promise<ActionResponse<{ user: UserGType }>> {
+  const validationResult = await action({
+    params,
+    schema: UserProfileSchema,
+    authorize: true,
+  });
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const { user } = validationResult.session!;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(user?.id, params, {
+      new: true,
+    });
+    return {
+      success: true,
+      data: {
+        user: JSON.parse(JSON.stringify(updatedUser)),
       },
     };
   } catch (error) {

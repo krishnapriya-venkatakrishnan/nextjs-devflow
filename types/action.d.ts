@@ -162,3 +162,11 @@ interface GetJobListingsProps {
   workplace_address: Record<string, string>;
   webpage_url: string;
 }
+
+interface UpdateUserProfile {
+  name?: string;
+  username?: string;
+  portfolio?: string;
+  location?: string;
+  bio?: string;
+}

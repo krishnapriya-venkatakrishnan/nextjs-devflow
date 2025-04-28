@@ -260,3 +260,24 @@ export const GlobalSearchSchema = z.object({
   global: z.string().optional(),
   type: z.string().optional(),
 });
+
+export const UserProfileSchema = z.object({
+  name: z
+    .string()
+    .min(3, {
+      message: "Name must be at least 3 characters.",
+    })
+    .max(130, { message: "Name must not be longer then 130 characters." }),
+  username: z
+    .string()
+    .min(3, { message: "username must not be longer then 100 characters." }),
+  portfolio: z
+    .string()
+    .url({ message: "Please provide valid URL" })
+    .or(z.literal(""))
+    .optional(),
+  location: z.string().min(3, { message: "Please provide proper location" }),
+  bio: z.string().min(3, {
+    message: "Bio must be at least 3 characters.",
+  }),
+});
