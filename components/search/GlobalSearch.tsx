@@ -66,6 +66,7 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
   }, [searchGlobal, pathname, router, searchParams]);
 
   useEffect(() => {
+    setSearchResults([{ content: "", category: "", href: "" }]);
     if (searchGlobal) fetchData();
   }, [searchGlobal, active]);
 
@@ -145,7 +146,7 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
                 <Button
                   key={type.name}
                   className={cn(
-                    `body-medium rounded-lg px-6 py-3 capitalize shadow-none`,
+                    `body-medium rounded-full px-6 py-3 capitalize shadow-none`,
                     active === type.value
                       ? "bg-primary-500 text-primary-100 hover:bg-primary-500 dark:bg-dark-400 dark:text-primary-100 dark:hover:bg-dark-400"
                       : "bg-light-800 text-light-500 hover:bg-light-800 dark:bg-dark-300 dark:text-light-500 dark:hover:bg-dark-300"
@@ -157,26 +158,38 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
               ))}
             </div>
           </div>
-          <div className="p-4 border-2 border-black">
-            {searchResults.map((result, index) => (
-              <Link href={result.href} key={index}>
-                <div className="flex items-center gap-4">
-                  <Image
-                    src="/icons/tag.svg"
-                    alt="tag"
-                    height={20}
-                    width={20}
-                  />
-                  <div className="flex flex-col gap-1">
-                    <p>{result.content}</p>
-                    <p className="bg-light-800 text-light-500 hover:bg-light-800 dark:bg-dark-300 dark:text-light-500 dark:hover:bg-dark-300">
-                      {result.content}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {searchResults[0].content ? (
+            <div className="p-4 border-2 border-black">
+              <div className="mb-4 text-xl">Top Match</div>
+              {searchResults[0].content &&
+                searchResults.map((result, index) => (
+                  <Link
+                    href={result.href}
+                    key={index}
+                    onClick={() => setSearchGlobal("")}
+                  >
+                    <div className="flex items-center gap-6 py-4">
+                      <Image
+                        src="/icons/tag.svg"
+                        alt="tag"
+                        height={20}
+                        width={20}
+                      />
+                      <div className="flex flex-col gap-2">
+                        <p>{result.content}</p>
+                        <p className="body-medium rounded-full py-2 capitalize shadow-none text-light-500 w-fit">
+                          {result.category}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          ) : (
+            <div className="p-4 border-2 border-black delay-response transition-all duration-300">
+              No match found
+            </div>
+          )}
         </div>
       )}
     </div>

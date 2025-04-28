@@ -421,3 +421,14 @@ code {
   display: grid !important; /* Apply grid only if it's visible */
   width: 100% !important;
 }
+
+.delay-response {
+  opacity: 0;
+  animation: delay 3s ease-in 0s forwards;
+}
+
+@keyframes delay {
+  100% {
+    opacity: 1;
+  }
+}
