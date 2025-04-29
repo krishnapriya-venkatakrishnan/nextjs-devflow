@@ -213,6 +213,7 @@ const Profile = async ({ params, searchParams }: RouteParams) => {
                       showActionBtns={
                         loggedInUser?.user?.id === answer.author._id
                       }
+                      userId={loggedInUser?.user?.id}
                     />
                   ))}
                 </div>

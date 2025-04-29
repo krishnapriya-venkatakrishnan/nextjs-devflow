@@ -18,6 +18,7 @@ import { hasVoted } from "@/lib/actions/vote.action";
 import SaveQuestion from "@/components/questions/SaveQuestion";
 import { hasSavedQuestion } from "@/lib/actions/collection.action";
 import { Metadata } from "next";
+import { auth } from "@/auth";
 
 export async function generateMetadata({
   params,
@@ -44,6 +45,9 @@ export async function generateMetadata({
 }
 
 const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
+  const session = await auth();
+  const userId = session?.user?.id;
+
   const { id } = await params;
   const { page, pageSize, filter } = await searchParams;
   const { success, data: question } = await getQuestion({ questionId: id });
@@ -99,6 +103,7 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
                 upvotes={question.upvotes}
                 downvotes={question.downvotes}
                 hasVotedPromise={hasVotedPromise}
+                userId={userId}
               />
             </Suspense>
             <Suspense fallback={<div>Loading...</div>}>
@@ -160,6 +165,7 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
           success={areAnswersLoaded}
           error={answersError}
           totalAnswers={answersResult?.totalAnswers || 0}
+          userId={userId}
         />
       </section>
       <section className="my-5">

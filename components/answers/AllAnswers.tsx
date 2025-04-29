@@ -10,6 +10,7 @@ interface Props extends ActionResponse<Answer[]> {
   page: number;
   isNext: boolean;
   totalAnswers: number;
+  userId?: string;
 }
 
 const AllAnswers = ({
@@ -19,6 +20,7 @@ const AllAnswers = ({
   success,
   error,
   totalAnswers,
+  userId,
 }: Props) => {
   return (
     <div className="mt-11">
@@ -39,7 +41,9 @@ const AllAnswers = ({
         success={success}
         empty={EMPTY_ANSWERS}
         render={(answers) =>
-          answers.map((answer) => <AnswerCard key={answer._id} {...answer} />)
+          answers.map((answer) => (
+            <AnswerCard key={answer._id} userId={userId} {...answer} />
+          ))
         }
       />
       <Pagination page={page} isNext={isNext} />
