@@ -32,15 +32,19 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
   const [searchResults, setSearchResults] = useState([
     { content: "", category: "", href: "" },
   ]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = async (query: string, type: string) => {
+    setLoading(true);
     const { success, data } = await performGlobalSearch({
-      global: searchGlobal,
-      type: active,
+      global: query,
+      type: type,
     });
-    const results = await data;
-    if (success && results?.length) setSearchResults(results);
-    return results;
+
+    if (success && data?.length) setSearchResults(data);
+    else setSearchResults([]);
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -66,8 +70,16 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
   }, [searchGlobal, pathname, router, searchParams]);
 
   useEffect(() => {
-    setSearchResults([{ content: "", category: "", href: "" }]);
-    if (searchGlobal) fetchData();
+    const handler = setTimeout(() => {
+      if (searchGlobal) {
+        fetchData(searchGlobal, active);
+      } else {
+        setLoading(true);
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(handler);
   }, [searchGlobal, active]);
 
   useEffect(() => {
@@ -120,7 +132,7 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
       className={`relative background-light800_darkgradient flex flex-col min-h-[56px] grow items-center gap-4 rounded-2.5 px-4 flex-1 max-w-[700px]`}
       ref={globaleRef}
     >
-      <div className="w-full flex">
+      <div className="w-full flex items-center pt-2">
         <Image
           src={imgSrc}
           alt="Search"
@@ -138,8 +150,8 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
         />
       </div>
       {searchGlobal && (
-        <div className="absolute top-12 bg-dark-400 w-full min-h-[56px] flex flex-col">
-          <div className="flex items-center justify-between p-4 border-2 border-black">
+        <div className="absolute top-20 background-light800_dark400 w-full min-h-[56px] flex flex-col rounded-2xl">
+          <div className="flex items-center justify-between p-4 ">
             <p>Type:</p>
             <div className="hidden flex-wrap gap-3 sm:flex">
               {types.map((type) => (
@@ -149,7 +161,7 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
                     `body-medium rounded-full px-6 py-3 capitalize shadow-none`,
                     active === type.value
                       ? "bg-primary-500 text-primary-100 hover:bg-primary-500 dark:bg-dark-400 dark:text-primary-100 dark:hover:bg-dark-400"
-                      : "bg-light-800 text-light-500 hover:bg-light-800 dark:bg-dark-300 dark:text-light-500 dark:hover:bg-dark-300"
+                      : "bg-light-500 text-dark-300 hover:bg-light-800 dark:bg-dark-300 dark:text-light-500 dark:hover:bg-dark-300"
                   )}
                   onClick={() => handleTypeClick(type.value)}
                 >
@@ -158,22 +170,38 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
               ))}
             </div>
           </div>
-          {searchResults[0].content ? (
-            <div className="p-4 border-2 border-black">
-              <div className="mb-4 text-xl">Top Match</div>
-              {searchResults[0].content &&
-                searchResults.map((result, index) => (
+          {loading ? (
+            <div className="p-4 text-center italic">
+              Searching the database...
+            </div>
+          ) : searchResults.length === 0 ? (
+            <div className="p-4 text-center">No match found</div>
+          ) : (
+            searchResults[0].content && (
+              <div className=" ">
+                <div className="p-4 mb-4 text-xl font-bold border-t-2 border-t-slate-300 dark:border-t-slate-500">
+                  Top Match
+                </div>
+                {searchResults.map((result, index) => (
                   <Link
                     href={result.href}
                     key={index}
                     onClick={() => setSearchGlobal("")}
                   >
-                    <div className="flex items-center gap-6 py-4">
+                    <div className="flex items-center gap-6 py-4 hover:shadow-sm">
                       <Image
                         src="/icons/tag.svg"
                         alt="tag"
                         height={20}
                         width={20}
+                        className="ml-4 hidden dark:block"
+                      />
+                      <Image
+                        src="/icons/tag-light.svg"
+                        alt="tag"
+                        height={20}
+                        width={20}
+                        className="ml-4 block dark:hidden"
                       />
                       <div className="flex flex-col gap-2">
                         <p>{result.content}</p>
@@ -184,11 +212,8 @@ const GlobalSearch = ({ imgSrc, placeholder }: Props) => {
                     </div>
                   </Link>
                 ))}
-            </div>
-          ) : (
-            <div className="p-4 border-2 border-black delay-response transition-all duration-300">
-              No match found
-            </div>
+              </div>
+            )
           )}
         </div>
       )}
