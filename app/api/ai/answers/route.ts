@@ -1,3 +1,5 @@
+export const maxDuration = 5;
+
 import handleError from "@/lib/handlers/error";
 import { ValidationError } from "@/lib/http-errors";
 import { AIAnswerSchema } from "@/lib/validation";
