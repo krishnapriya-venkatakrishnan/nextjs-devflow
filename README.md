@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💬 Dev Overflow
 
-## Getting Started
+A full-stack Q&A platform inspired by Stack Overflow, built to facilitate knowledge sharing, developer collaboration, and community interaction. Dev Overflow enables users to ask technical questions, provide answers, vote, save content, and even get AI-generated solutions — all in a modern, responsive, and theme-switchable UI.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🖼️ Project Structure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Root Layout**
+  - 🔍 **Navbar** – Global search bar at the top
+  - 📦 **Container**
+    - 📚 **Left Sidebar** – Page navigation
+    - 📄 **Main Section** – Displays the selected page's content
+    - ⭐ **Right Sidebar** – Shows top questions and popular tags
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Features
 
-## Learn More
+- 🔐 **Authentication**
+  - Email/password login
+  - Social login via Google & GitHub
+- 🌐 **Global & Local Search**
+  - Smart search across questions, answers, tags, and users
+- 🏠 **Home Page**
+  - Filterable question cards with local search
+- ❓ **Ask a Question**
+  - Form to post questions with tag support
+- 💬 **Answer Submission**
+  - Answer form with OpenAI integration
+- 🔼🔽 **Voting System**
+  - Upvote/downvote with user-specific coloring
+- 🧾 **Question Details**
+  - View counts, answers, vote stats, user info
+- 🧠 **AI Answers**
+  - Auto-generate suggested answers via OpenAI
+- 🧑‍🤝‍🧑 **Community Page**
+  - Lists all registered users
+- 📁 **Collections**
+  - View saved questions
+- 🏷️ **Tags Page**
+  - Explore tags and the questions associated with it
+- 🧑 **User Profile**
+  - View/edit/delete questions and answers
+  - Reputation & recommendation system with badges
+- 💼 **Find Jobs**
+  - Jobs pulled from Arbetsförmedlingen API
+- 🎨 **Theme Support**
+  - Light / Dark / System-based theming
+- 📄 **Pagination & Filters**
+  - Implemented across all data views
+- 🏆 **Top Results**
+  - Displays top 5 questions by views and votes
+  - Displays top 5 popular tags
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🧩 Frontend
 
-## Deploy on Vercel
+- **React.js**
+- **Next.js**
+- **TailwindCSS**
+- **TypeScript**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### ⚙️ Backend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **MongoDB**
+- **NextAuth.js**
+- 🔧 **Server Actions** (for interacting with MongoDB)
+- 🔗 **API Routes** (user/account endpoints)
+- 🛠️ **Error & Log Handlers**
+
+### 🧠 AI Integration
+
+- **OpenAI API**
+
+---
+
+## 🔗 Live Demo
+
+👉 [Click here to view Dev Overflow live](https://nextjs-devflow-nu.vercel.app/)
