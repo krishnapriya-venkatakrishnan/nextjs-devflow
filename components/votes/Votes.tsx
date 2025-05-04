@@ -4,7 +4,6 @@ import { createVote } from "@/lib/actions/vote.action";
 import { formatNumber } from "@/lib/utils";
 import { HasVotedResponse } from "@/types/action";
 import { ActionResponse } from "@/types/global";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { use, useState } from "react";
 

@@ -110,6 +110,7 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
               <SaveQuestion
                 questionId={question._id}
                 hasSavedQuestionPromise={hasSavedQuestionPromise}
+                userId={userId}
               />
             </Suspense>
           </div>
@@ -173,6 +174,7 @@ const QuestionDetails = async ({ params, searchParams }: RouteParams) => {
           questionId={question._id}
           questionTitle={question.title}
           questionContent={question.content}
+          userId={userId}
         />
       </section>
     </>
