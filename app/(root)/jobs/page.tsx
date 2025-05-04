@@ -37,12 +37,14 @@ const FindJobs = async ({ searchParams }: RouteParams) => {
           placeholder="Search in ad headline, ad description and employer name"
           otherClasses="pl-6"
         />
-        <CommonFilter
-          filters={jobFilterLocations}
-          otherClasses="min-h-[56px] sm:min-w-[170px]"
-          containerClasses="flex"
-          jobFilter={true}
-        />
+        {jobFilterLocations && (
+          <CommonFilter
+            filters={jobFilterLocations}
+            otherClasses="min-h-[56px] sm:min-w-[170px]"
+            containerClasses="flex"
+            jobFilter={true}
+          />
+        )}
       </div>
       <DataRenderer
         success={true}
